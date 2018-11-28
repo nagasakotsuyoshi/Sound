@@ -1,0 +1,5 @@
+https://ubuntuforums.org/showthread.php?t=2188686               
+96kHzはそのままの仕様だとできないらしい                         
+/etc/pulse/daemon.confで48000hzに落とされるようにしているみたい 
+http://manpages.ubuntu.com/manpages/cosmic/man1/aplay.1.html
+aplay arecordのについて

@@ -1,0 +1,11 @@
+nagasako@ishimakigai:~/work$ ./dumpwave -0 ./SoundCanceller_of_f2fSpeaker/record_00.wav 
+# filename = './SoundCanceller_of_f2fSpeaker/record_00.wav'
+# [RIFF] (8036 bytes)
+# [WAVEfmt ] (16 bytes)
+#  Data type = 1 (1 = PCM)
+#  Number of channels = 1 (1 = mono, 2 = stereo)
+#  Sampling rate = 4000Hz
+#  Bytes / second = 16000
+#  Bytes x channels = 4
+#  Bits / sample = 16
+# [data] (8016 bytes)
