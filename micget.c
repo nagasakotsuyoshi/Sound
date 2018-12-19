@@ -89,6 +89,7 @@ static void StartRecorder(int rch, int desire_rate, int seconds)
     int err;
     int i, j, k;
     short *sp;
+    int cnt=0;
     while ( bRunning == TRUE ) {
         if ( (err = snd_pcm_readi(capture_handle,buffer,buffer_frames)) != buffer_frames ) {
             printf("%d: read from audio interface failed (%s)\n",err,snd_strerror(err)); break;
@@ -96,10 +97,17 @@ static void StartRecorder(int rch, int desire_rate, int seconds)
 	k = length / 2; /* 16bit=2byte */
 	sp = buffer;
 	j = 0;
+	
 	for (i = 0; i < k; i += 1) {
 	  j += ABS(sp[i]);
+
 	}
 	printf("%d\n", j / (k / 1));
+	if(cnt==10){
+	  break;
+	  cnt = 0;
+	}
+	cnt++;
     }
     free(buffer);
     // - [WAVE] Fix PCM/RIFF chunk size
@@ -107,19 +115,35 @@ static void StartRecorder(int rch, int desire_rate, int seconds)
     // - [ASOUND] close
     snd_pcm_close(capture_handle);
     printf("audio interface closed\n");
+
 }
+
+void record(){
+    struct sigaction sa; sa.sa_flags = 0; sa.sa_handler = SigIntAction;
+    sigemptyset(&sa.sa_mask); sigaction(SIGINT,&sa,NULL);
+
+    bRunning = TRUE;
+    StartRecorder(0,48000,1);
+    bRunning = FALSE;
+
+  
+}
+
+
 // example of arecord
 // % arecord hw:1 (plughw:1)
 // % arecord -l -> card info.
 // % arecord -c 1 -f S16_LE -r 44100 sample.wav -D hw:1 (plughw:1) -> record
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
     struct sigaction sa; sa.sa_flags = 0; sa.sa_handler = SigIntAction;
     sigemptyset(&sa.sa_mask); sigaction(SIGINT,&sa,NULL);
 
     bRunning = TRUE;
-    StartRecorder(0,44100,1);
+    StartRecorder(0,48000,1);
     bRunning = FALSE;
     
     return 0;
 }
+
+*/
