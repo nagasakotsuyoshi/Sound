@@ -167,3 +167,4 @@ int main(int argc, char *argv[]) {
   
   return 0;
 }
+	//printf("buffer : %ld\n",sizeof(buffer)/sizeof(buffer[0]));

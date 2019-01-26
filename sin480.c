@@ -1,3 +1,4 @@
+
 /*
  *  This extra small demo sends a random samples to your speakers.
  */
@@ -5,12 +6,12 @@
 #include <math.h>
 #include "inputKey.h"
 #include <unistd.h>
-static char *device = "default";                        /* playback device */
+static char *device = "plughw:1,0";                        /* playback device */
 snd_output_t *output = NULL;
 // #define BUFSIZE 16*1024
 #define BUFSIZE 65536
 #define NCHAN 2
-#define SMPLFREQ 48000		/* sample rate */
+#define SMPLFREQ 192000		/* sample rate */
 int16_t buffer[BUFSIZE];                          /* some random data */
 #define PI 3.141592
 int main(int argc, char *argv[]) {
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
   printf("deltatheta=%f nsample = %d\n", deltatheta,nsample);
   for (i = 0; i < nsample*2 ; i+=2) {
     buffer[i] = sin(theta)*30000;
-    buffer[i+1] = sin(theta)*30000;
+    buffer[i+1] = sin(theta)*30000*0;
     theta += deltatheta;
   }
   

@@ -136,6 +136,19 @@ static void StartRecorder(int rch, int desire_rate, int seconds)
     snd_pcm_close(capture_handle);
     printf("audio interface closed\n");
 }
+void recordexe(){
+    struct sigaction sa; sa.sa_flags = 0; sa.sa_handler = SigIntAction;
+    sigemptyset(&sa.sa_mask); sigaction(SIGINT,&sa,NULL);
+
+    bRunning = TRUE;
+    StartRecorder(0,44100,1);
+    bRunning = FALSE;
+
+  
+}
+
+
+
 // example of arecord
 // % arecord hw:1 (plughw:1)
 // % arecord -l -> card info.
@@ -146,8 +159,9 @@ int main(int argc, char *argv[])
     sigemptyset(&sa.sa_mask); sigaction(SIGINT,&sa,NULL);
 
     bRunning = TRUE;
-    StartRecorder(0,44100,1);
+    StartRecorder(0,44100,10);
     bRunning = FALSE;
     
     return 0;
 }
+
