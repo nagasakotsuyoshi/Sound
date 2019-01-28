@@ -1,4 +1,4 @@
-# SoundCanceller_of_f2fSpeaker
+# SoundCanceller in oposite Speaker
 対面型配置スピーカーの実験に使うソースコードを保存していきます
 #alsa-library Install
 '$ sudo apt-get install libasound2-dev libesd0'
