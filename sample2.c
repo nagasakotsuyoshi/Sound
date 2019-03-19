@@ -7,13 +7,13 @@
  
 /* PCMデフォルト設定 */
 #define DEF_CHANNEL         2
-#define DEF_FS              44100
+#define DEF_FS              192000
 #define DEF_BITPERSAMPLE    16
 #define WAVE_FORMAT_PCM     1
 #define BUF_SAMPLES         1024
 
-#define Delay               101/*192k : 441*/
-#define Amplitude           5 /* 6000/30000 */
+#define Delay               393/*192k : 960Hz*/
+#define Amplitude           6 /* 5000/30000 */
 /* ChunkID 定義 */
 const char ID_RIFF[4] = "RIFF";
 const char ID_WAVE[4] = "WAVE";
@@ -54,6 +54,7 @@ static int readWavHeader(FILE *fp, WAVEFORMATEX *wf)
         printf("file is not RIFF Format \n");
         return ret;
     }
+ 
     /* Read Wave */
     if((fread(FormatTag, 1, 4, fp) != 4) ||
        (strncmp(FormatTag, ID_WAVE, 4) != 0)){
@@ -83,8 +84,6 @@ static int readWavHeader(FILE *fp, WAVEFORMATEX *wf)
             continue;
         }
     }
-
-
 }
  
 int main(int argc, char *argv[])
@@ -140,7 +139,13 @@ int main(int argc, char *argv[])
         printf("malloc error\n");
         goto End;
     }
-
+    /* prepare delay */
+    buffer_delay = malloc(dSize+Delay*2*wf.nBlockAlign);
+    if(buffer_delay == NULL) {
+        printf("malloc error\n");
+        goto End;
+    }
+ 
     
     /* 再生用PCMストリームを開く */
     ret = snd_pcm_open(&hndl, device, SND_PCM_STREAM_PLAYBACK, 0);
@@ -160,6 +165,24 @@ int main(int argc, char *argv[])
     for (n = 0; n < dSize; n += BUF_SAMPLES * wf.nBlockAlign) {/*  1024*16/8*2ch */
         /* PCMの読み込み */
         fread(buffer, wf.nBlockAlign, BUF_SAMPLES, fp);
+        if(n == 0){
+            for(i=0;i<Delay*2;i++){
+                *(buffer_delay+i) = 0;
+            }
+            for(i=Delay*2;i<Delay*2+BUF_SAMPLES;i++){
+                *(buffer_delay+i) = *(buffer+(i-Delay*2))/Amplitude*(-1);
+                *(buffer+(i-Delay*2)) += *(buffer_delay+(i-Delay*2));
+            }
+
+        }else{
+            for(i=0;i<BUF_SAMPLES;i++){
+                *(buffer_delay+Delay*2+n/wf.nBlockAlign + i) = *(buffer+i)/5*(-1);
+                *(buffer+i) += *(buffer_delay+Delay*2+n/wf.nBlockAlign + i);
+                //if(i==BUF_SAMPLES-1)
+                //    printf("buffer = %d \n",*(buffer+i));
+            }
+
+        }
         /* PCMの書き込み */
         reSize = (n < BUF_SAMPLES) ? n : BUF_SAMPLES;
         ret = snd_pcm_writei(hndl, (const void*)buffer, reSize);
@@ -192,7 +215,9 @@ End:
     if (buffer != NULL) {
         free(buffer);
     }
-   
+    if (buffer_delay != NULL) {
+        free(buffer_delay);
+    }
      
     return 0;
 }
